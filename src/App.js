@@ -1,23 +1,37 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import Products from './products/Products';
+import Login from './user/Login';
 
 function App() {
+  const [user, setUser]= useState();
+  const [isLogged, setIsLogged]= useState();
+
+  useEffect(() => {
+    fetch("https://api.shipap.co.il/login", {
+    credentials: 'include',
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.status === "succsses"){
+      setUser(data.user);
+      setIsLogged(true);
+    } else {
+      setUser();
+      setIsLogged(false);
+    }
+  });
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>ניהול מוצרים</h1>
+
+      <div className="frame">
+        {
+          isLogged? <Products /> : <Login />
+        }
+      </div>
     </div>
   );
 }
