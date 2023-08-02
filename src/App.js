@@ -16,6 +16,7 @@ function App() {
     if(data.status === "succsses"){
       setUser(data.user);
       setIsLogged(true);
+      console.log("bla");
     } else {
       setUser();
       setIsLogged(false);
