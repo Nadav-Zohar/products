@@ -74,7 +74,7 @@ export default function Login({ success }) {
             {
                 isSignup ? 
                 <>
-                    <Signup />
+                    <Signup success={user => { setFormData({ ...formData, userName: user.userName }); setIsSignup(false) }} />
                     <p className="signup">
                         <a onClick={() => setIsSignup(false)}>To Log In Press Here</a>
                     </p>

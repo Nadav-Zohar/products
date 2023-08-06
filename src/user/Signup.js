@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './User.css';
 import Joi from 'joi';
 
-export default function Signup() {
+export default function Signup({success}) {
     const [formData, setFormData] = useState({
         userName: '',
         password: '',
@@ -11,6 +11,7 @@ export default function Signup() {
     });
     const [errors, setErrors] = useState({});
     const [isValid, setIsValid] = useState(false);
+    const [signupError, setSignupError] = useState('');
 
 
     const signupSchema = Joi.object({
@@ -30,6 +31,14 @@ export default function Signup() {
                 'Content-type': 'application/json'
             },
             body: JSON.stringify(formData),
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.status ==="success"){
+                success(data.user)
+            } else {
+                setSignupError(data.message);
+            }
         })
     }
 
@@ -96,6 +105,7 @@ export default function Signup() {
 
 
                             <button>Sign Up</button>
+                            {signupError && <div className='fieldError'>{signupError}</div>}
 
                         </form>
                     </div>
