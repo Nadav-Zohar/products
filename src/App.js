@@ -5,34 +5,41 @@ import Login from './user/Login';
 import Logout from './user/Logout';
 
 function App() {
-  const [user, setUser] = useState();
-  const [isLogged, setIsLogged] = useState();
+    const [user, setUser] = useState();
+    const [isLogged, setIsLogged] = useState();
 
-  useEffect(() => {
-      fetch("https://api.shipap.co.il/login", {
-          credentials: 'include',
-      })
-      .then(res => res.json())
-      .then(data => {
-          if (data.status === 'success') {
-              updateUser(data.user);
-          } else {
-              setUser();
-              setIsLogged(false);
-          }
-      });
-  }, []);
+    useEffect(() => {
+        fetch("https://api.shipap.co.il/login", {
+            credentials: 'include',
+        })
+        .then(res => {
+            if (res.ok) {
+                return res.json();
+            } else {
+                return res.text().then(x => {
+                    throw new Error(x);
+                });
+            }
+        })
+        .then(data => {
+            updateUser(data);
+        })
+        .catch(err => {
+            setUser();
+            setIsLogged(false);
+        });
+    },[]);
 
-  const updateUser = user => {
-      setUser(user);
-      setIsLogged(true);
-  }
-  const clearUser = () => {
-    setUser();
-    setIsLogged(false);
+    const updateUser = user => {
+        setUser(user);
+        setIsLogged(true);
+    }
+    const clearUser = () => {
+        setUser();
+        setIsLogged(false);
 }
 
-  return (
+    return (
     <>
         {
             isLogged === undefined ? '' : 
@@ -43,7 +50,7 @@ function App() {
                     {
                         isLogged ?
                         <>
-                            <div>{user.fullName} מחובר! <Logout success={clearUser} /></div>
+                            <div>{user.fullName} Is Online! <Logout success={clearUser} /></div>
                             <Products />
                         </> :
                         <Login success={updateUser} />
