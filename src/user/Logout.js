@@ -11,5 +11,5 @@ export default function Logout({ success }) {
         });
     }
 
-    return <button className="logout" onClick={logout}>התנתק</button>
+    return <button className="logout" onClick={logout}>log out</button>
 }

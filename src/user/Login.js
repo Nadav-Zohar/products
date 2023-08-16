@@ -22,24 +22,29 @@ export default function Login({ success }) {
     const login = ev => {
         ev.preventDefault();
 
-        fetch("https://api.shipap.co.il/login", {
-            credentials: 'include',
-            method: 'POST',
-            headers: {
-                'Content-type': 'application/json'
-            },
-            body: JSON.stringify(formData),
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status === 'success') {
-                success(data.user);
-            } else {
-                setLoginError(data.message);
-            }
+        fetch(`https://api.shipap.co.il/login`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {'Content-type': 'application/json'},
+        body: JSON.stringify(formData),
+    })
+    .then(res => {
+        if (res.ok) {
+            return res.json();
+        } else {
+            return res.text().then(x => {
+            throw new Error(x);
         });
     }
-
+    })
+    .then(data => {
+        success(data);
+    })
+    .catch(err => {
+        setLoginError(err.message);
+    });
+    }
+    
     const handelInput = ev => {
         const { name, value } = ev.target;
         

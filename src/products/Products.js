@@ -1,59 +1,79 @@
-import { useEffect } from 'react';
 import './Products.css';
-import { useState } from 'react';
-import { AiFillDelete } from "react-icons/ai";
+import { useEffect, useState } from 'react';
+import { AiFillDelete, AiFillEdit } from "react-icons/ai";
+import AddProduct from './AddProduct';
+import EditProduct from './EditProduct';
 
 export default function Products() {
-    const [products, setProducts]= useState([]);
+    const [products, setProducts] = useState([]);
+    const [productEdited, setProductEdited] = useState();
 
-    useEffect(() =>{
+    useEffect(() => {
         fetch("https://api.shipap.co.il/products", {
-        credentials:"include",
-    })
-    .then(res => res.json())
-    .then(data => {
-        setProducts(data);
-    })
+            credentials: 'include',
+        })
+        .then(res => res.json())
+        .then(data => {
+            setProducts(data);
+        });
     }, []);
-    
+
     function removeProduct(id) {
+        if (!window.confirm("are you sure?")) {
+            return;
+        }
+
         fetch(`https://api.shipap.co.il/products/${id}`, {
             credentials: 'include',
             method: 'DELETE',
         })
         .then(() => {
-            const newProducts= products.filter(p => p.id !== id);
-            setProducts(newProducts)
+            setProducts(products.filter(x => x.id !== id));
         });
     }
-    
-    
+
+    const update = p => {
+        if (p) {
+            const i = products.findIndex(x => x.id == p.id);
+            products.splice(i, 1, p);
+            setProducts(products);
+        }
+
+        setProductEdited();
+    }
+
     return (
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Product Name</th>
-                    <th>Product Price</th>
-                    <th>Product Discount</th>
-                    <th>Product Time</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {products.map((p, i) => 
-                <tr key={p.id}>
-                    <td>{i +1}</td>
-                    <td>{p.name}</td>
-                    <td>{p.price}</td>
-                    <td>{p.discount}</td>
-                    <td>{p.time}</td>
-                    <td>
-                        <button className='remove' onClick={() => removeProduct(p.id)}><AiFillDelete /></button>
-                    </td>
-                </tr>)}
-            </tbody>
-        </table>
+        <>
+            <AddProduct added={newProduct => setProducts([...products, newProduct])} />
+            <EditProduct product={productEdited} productChange={update} />
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>product's name</th>
+                        <th>price</th>
+                        <th>sale</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {
+                        products.map((p, i) => 
+                            <tr key={p.id}>
+                                <td>{i + 1}</td>
+                                <td>{p.name}</td>
+                                <td>{p.price}</td>
+                                <td>{p.discount}</td>
+                                <td>
+                                    <button className='edit' onClick={() => setProductEdited(p)}><AiFillEdit /></button>
+                                    <button className='remove' onClick={() => removeProduct(p.id)}><AiFillDelete /></button>
+                                </td>
+                            </tr>
+                        )
+                    }
+                </tbody>
+            </table>
+        </>
     )
 }
-
