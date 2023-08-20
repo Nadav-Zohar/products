@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import './User.css';
 import Joi from 'joi';
 import Signup from "./Signup";
+import { GeneralContext } from '../App';
 
-export default function Login({ success }) {
+export default function Login() {
+    const {setIsLoader, setUser, setIsLogged, snackbar } = useContext(GeneralContext);
     const [formData, setFormData] = useState({
         userName: '',
         password: '',
@@ -22,6 +24,7 @@ export default function Login({ success }) {
     const login = ev => {
         ev.preventDefault();
 
+        setIsLoader(true);
         fetch(`https://api.shipap.co.il/login`, {
         credentials: 'include',
         method: 'POST',
@@ -38,10 +41,17 @@ export default function Login({ success }) {
     }
     })
     .then(data => {
-        success(data);
+        setUser(data);
+        setIsLogged(true);
+        snackbar(`${data.fullName} is on`);
+
     })
     .catch(err => {
         setLoginError(err.message);
+        snackbar(err.message);
+    })
+    .finally(() => {
+        setIsLoader(false);
     });
     }
     

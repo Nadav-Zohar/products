@@ -1,20 +1,25 @@
 import './Products.css';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import AddProduct from './AddProduct';
 import EditProduct from './EditProduct';
+import { GeneralContext } from '../App';
+import Logout from '../user/Logout';
 
 export default function Products() {
     const [products, setProducts] = useState([]);
     const [productEdited, setProductEdited] = useState();
+    const {setIsLoader, user, snackbar} = useContext(GeneralContext);
 
     useEffect(() => {
+        setIsLoader(true);
         fetch("https://api.shipap.co.il/products", {
             credentials: 'include',
         })
         .then(res => res.json())
         .then(data => {
             setProducts(data);
+            setIsLoader(false);
         });
     }, []);
 
@@ -43,7 +48,8 @@ export default function Products() {
     }
 
     return (
-        <>
+        <>  
+            <div>{user.fullName} is online! <Logout /></div>
             <AddProduct added={newProduct => setProducts([...products, newProduct])} />
             <EditProduct product={productEdited} productChange={update} />
 
@@ -60,7 +66,9 @@ export default function Products() {
                 <tbody>
                     {
                         products.map((p, i) => 
-                            <tr key={p.id}>
+                            <tr key={p.id} onDoubleClick={() => {
+                                setProductEdited(p)
+                            }}>
                                 <td>{i + 1}</td>
                                 <td>{p.name}</td>
                                 <td>{p.price}</td>

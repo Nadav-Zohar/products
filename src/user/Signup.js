@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import './User.css';
 import Joi from 'joi';
+import { GeneralContext } from '../App';
 
 export default function Signup({success}) {
+    const {setIsLoader, snackbar} = useContext(GeneralContext);
     const [formData, setFormData] = useState({
         userName: '',
         password: '',
@@ -23,7 +25,8 @@ export default function Signup({success}) {
 
     const signUp = ev => {
         ev.preventDefault();
-
+        
+        setIsLoader(true);
         fetch("https://api.shipap.co.il/signup", {
             credentials: 'include',
             method: 'POST',
@@ -35,10 +38,15 @@ export default function Signup({success}) {
         .then(res => res.json())
         .then(data => {
             if(data.status ==="success"){
-                success(data.user)
+                success(data.user);
+                snackbar("user created");
             } else {
                 setSignupError(data.message);
+                snackbar(data.message);
             }
+        })
+        .finally(() => {
+            setIsLoader(false);
         })
     }
 

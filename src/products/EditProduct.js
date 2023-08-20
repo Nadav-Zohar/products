@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { GeneralContext } from "../App";
 
 export default function EditProduct({ product, productChange }) {
     const [formData, setFormData] = useState();
+    const {setIsLoader, snackbar} = useContext(GeneralContext);
+
 
     useEffect(() => {
         if (product) {
@@ -32,7 +35,7 @@ export default function EditProduct({ product, productChange }) {
             alert("no price?");
             return;
         }
-
+        setIsLoader(true);
         fetch(`https://api.shipap.co.il/products/${product.id}`, {
             credentials: 'include',
             method: 'PUT',
@@ -41,6 +44,8 @@ export default function EditProduct({ product, productChange }) {
         })
         .then(() => {
             productChange(formData);
+            setIsLoader(false);
+            snackbar("product edited");
         });
     }
 

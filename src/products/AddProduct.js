@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import './Products.css';
+import { GeneralContext } from '../App';
 
 export default function AddProduct({ added }) {
+    const {setIsLoader, snackbar} = useContext(GeneralContext);
     const [isModal, setIsModal] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
@@ -30,7 +32,7 @@ export default function AddProduct({ added }) {
             alert("ממש עצוב");
             return;
         }
-
+        setIsLoader(true);
         fetch(`https://api.shipap.co.il/products`, {
             credentials: 'include',
             method: 'POST',
@@ -41,6 +43,8 @@ export default function AddProduct({ added }) {
         .then(data => {
             added(data);
             setIsModal(false);
+            setIsLoader(false);
+            snackbar("product added");
         });
     }
 
